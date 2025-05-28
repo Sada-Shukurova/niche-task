@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import ThemeToggler from "../ThemeToggler";
 
 const Header: React.FC = () => {
   return (
@@ -10,8 +11,9 @@ const Header: React.FC = () => {
               NicheSolutions
             </NavLink>
           </div>
-          <div>
-            <NavLink to={"/notices"}>Notices</NavLink>
+          <div className="flex  items-center gap-10">
+            <NavLink to={"/notices?page=1"}>Notices</NavLink>
+            <ThemeToggler />
           </div>
         </div>
       </div>
