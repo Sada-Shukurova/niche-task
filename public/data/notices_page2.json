@@ -1,0 +1,40 @@
+{
+  "@context": "/contexts/Notice",
+  "@id": "/notices?page=2",
+  "@type": "hydra:Collection",
+  "hydra:member": [
+    {
+      "@id": "/notices/4",
+      "@type": "Notice",
+      "id": 4,
+      "title": "Fourth Notice",
+      "status": "archived",
+      "createdAt": "2025-05-22T15:00:00+00:00"
+    },
+    {
+      "@id": "/notices/5",
+      "@type": "Notice",
+      "id": 5,
+      "title": "Fifth Notice",
+      "status": "active",
+      "createdAt": "2025-05-23T08:45:00+00:00"
+    },
+    {
+      "@id": "/notices/6",
+      "@type": "Notice",
+      "id": 6,
+      "title": "Sixth Notice",
+      "status": "archived",
+      "createdAt": "2025-05-23T18:15:00+00:00"
+    }
+  ],
+  "hydra:totalItems": 9,
+  "hydra:view": {
+    "@id": "/notices?page=2",
+    "@type": "hydra:PartialCollectionView",
+    "hydra:first": "/notices?page=1",
+    "hydra:last": "/notices?page=3",
+    "hydra:previous": "/notices?page=1",
+    "hydra:next": "/notices?page=3"
+  }
+}
