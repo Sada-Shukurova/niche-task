@@ -1,61 +1,144 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import type { INotice, INoticeTotal } from "../../assets/types";
+import { useSearchParams } from "react-router-dom";
+
 const MyTable: React.FC = () => {
+  const [data, setData] = useState<INotice[]>([]);
+  const [allPages, setAllPages] = useState<number>(1);
+  const [sorted, setSorted] = useState<keyof INotice | "">("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [params, setParams] = useSearchParams();
+  const page = Number(params.get("page") || "1");
+
+  useEffect(() => {
+    getData(String(page)).catch(console.error);
+  }, [page]);
+
+  const getData = async (page: string) => {
+    try {
+      const resp = await axios.get<INoticeTotal>(
+        `/data/notices_page${page}.json`
+      );
+      const lastPage = +(
+        resp.data["hydra:view"]?.["hydra:last"]?.split("=")[1] ?? "1"
+      );
+
+      setAllPages(lastPage);
+      const people = resp.data["hydra:member"] ?? [];
+      setData(people);
+    } catch (error) {
+      console.log("Cannot get data", error);
+    }
+  };
+  // sort
+  const sortFunc = (key: keyof INotice) => {
+    let myOrder: "asc" | "desc" = "asc";
+    if (sorted === key) {
+      myOrder = sortOrder === "asc" ? "desc" : "asc";
+    }
+    setSorted(key);
+    setSortOrder(myOrder);
+  };
+  // filtering
+  const filteredNotices = (data || [])
+    .filter((notice) => {
+      return statusFilter ? notice.status.includes(statusFilter) : true;
+    })
+    .sort((a, b) => {
+      if (!sorted) return 0;
+      const aVal = a[sorted];
+      const bVal = b[sorted];
+      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
   return (
     <div className="mt-20">
+      <div className="flex justify-end mb-20">
+        <select
+          value={statusFilter}
+          className="select select-primary"
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
+          <option className="bg-primary text-primary-content" value="">
+            Status
+          </option>
+          <option className="bg-primary text-primary-content" value={"active"}>
+            Active
+          </option>
+          <option
+            className="bg-primary text-primary-content"
+            value={"archived"}
+          >
+            Archived
+          </option>
+        </select>
+      </div>
       <div className="overflow-x-auto">
-        <table className="table table-xs">
+        <table className="table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Created At</th>
+              <th
+                title="Click to Sort"
+                className="cursor-pointer"
+                onClick={() => sortFunc("id")}
+              >
+                ID
+              </th>
+              <th
+                title="Click to Sort"
+                className="cursor-pointer"
+                onClick={() => sortFunc("title")}
+              >
+                Title
+              </th>
+              <th
+                title="Click to Sort"
+                className="cursor-pointer"
+                onClick={() => sortFunc("status")}
+              >
+                Status
+              </th>
+              <th
+                title="Click to Sort"
+                className="cursor-pointer"
+                onClick={() => sortFunc("createdAt")}
+              >
+                Created At
+              </th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <th>1</th>
-              <td>Cy Ganderton</td>
-              <td>Quality Control Specialist</td>
-              <td>12/16/2020</td>
-            </tr>
-            <tr>
-              <th>2</th>
-              <td>Hart Hagerty</td>
-              <td>Desktop Support Technician</td>
-              <td>12/5/2020</td>
-            </tr>
-            <tr>
-              <th>3</th>
-              <td>Brice Swyre</td>
-              <td>Tax Accountant</td>
-              <td>8/15/2020</td>
-            </tr>
-            <tr>
-              <th>4</th>
-              <td>Marjy Ferencz</td>
-              <td>Office Assistant I</td>
-              <td>3/25/2021</td>
-            </tr>
-            <tr>
-              <th>5</th>
-              <td>Yancy Tear</td>
-              <td>Community Outreach Specialist</td>
-              <td>5/22/2020</td>
-            </tr>
-            <tr>
-              <th>6</th>
-              <td>Irma Vasilik</td>
-              <td>Editor</td>
-              <td>12/8/2020</td>
-            </tr>
+            {filteredNotices.map((notice) => {
+              return (
+                <tr key={notice.id}>
+                  <th>{notice.id}</th>
+                  <td>{notice.title}</td>
+                  <td>{notice.status}</td>
+                  <td>{new Date(notice.createdAt).toLocaleDateString()}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center mt-10">
+      <div className="flex justify-center mt-20">
         <div className="join ">
-          <button className="join-item btn  btn-active">1</button>
-          <button className="join-item btn">2</button>
-          <button className="join-item btn">3</button>
+          {Array.from({ length: allPages }).map((_, i) => (
+            <button
+              key={i + 1}
+              className={`join-item btn ${page === i + 1 ? "btn-active" : ""}`}
+              onClick={() => {
+                const newParams = new URLSearchParams(params);
+                newParams.set("page", String(i + 1));
+                setParams({ page: String(i + 1) });
+              }}
+            >
+              {i + 1}
+            </button>
+          ))}
         </div>
       </div>
     </div>
