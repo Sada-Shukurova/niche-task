@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const themes = {
   caramellatte: "caramellatte",
-  coffee: "coffee",
+  forest: "forest",
 };
 
 const ThemeToggler = () => {
@@ -21,7 +21,7 @@ const ThemeToggler = () => {
 
   function toggleTheme() {
     const newTheme =
-      theme === themes.caramellatte ? themes.coffee : themes.caramellatte;
+      theme === themes.caramellatte ? themes.forest : themes.caramellatte;
     localStorage.setItem("mode", newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
     setTheme(newTheme);
@@ -32,7 +32,7 @@ const ThemeToggler = () => {
       <label className="flex items-center gap-2 cursor-pointer">
         <input
           type="checkbox"
-          checked={theme === themes.coffee}
+          checked={theme === themes.forest}
           onChange={toggleTheme}
           className="toggle theme-controller"
         />
