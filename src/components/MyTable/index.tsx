@@ -76,37 +76,117 @@ const MyTable: React.FC = () => {
           </option>
         </select>
       </div>
-      <div className="overflow-x-auto">
-        <table className="table">
+      <div className="overflow-x-auto rounded-box  shadow-[0_0_15px_rgba(0,0,0,0.25)] shadow-primary-content/60  bg-accent/20">
+        <table className="table table-zebra">
           <thead>
             <tr>
               <th
                 title="Click to Sort"
-                className="cursor-pointer"
-                onClick={() => sortFunc("id")}
+                className="cursor-pointer p-3.5 bg-base-300 text-center font-black"
               >
-                ID
+                <span className="block" onClick={() => sortFunc("id")}>
+                  ID
+                </span>
+                <label className="input w-1/2 mx-auto mt-2">
+                  <svg
+                    className="h-[1em] opacity-50"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <g
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.3-4.3"></path>
+                    </g>
+                  </svg>
+                  <input type="search" required placeholder="Search" />
+                </label>
               </th>
               <th
                 title="Click to Sort"
-                className="cursor-pointer"
-                onClick={() => sortFunc("title")}
+                className="cursor-pointer p-3.5 bg-base-300 text-center font-black"
               >
-                Title
+                <span onClick={() => sortFunc("title")} className="block">
+                  Title
+                </span>
+                <label className="input w-1/2 mx-auto mt-2">
+                  <svg
+                    className="h-[1em] opacity-50"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <g
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.3-4.3"></path>
+                    </g>
+                  </svg>
+                  <input type="search" required placeholder="Search" />
+                </label>
               </th>
               <th
                 title="Click to Sort"
-                className="cursor-pointer"
-                onClick={() => sortFunc("status")}
+                className="cursor-pointer p-3.5 bg-base-300 text-center font-black"
               >
-                Status
+                <span className="block" onClick={() => sortFunc("status")}>
+                  Status
+                </span>
+                <label className="input w-1/2 mx-auto mt-2">
+                  <svg
+                    className="h-[1em] opacity-50"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <g
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.3-4.3"></path>
+                    </g>
+                  </svg>
+                  <input type="search" required placeholder="Search" />
+                </label>
               </th>
               <th
                 title="Click to Sort"
-                className="cursor-pointer"
-                onClick={() => sortFunc("createdAt")}
+                className="cursor-pointer p-3.5 bg-base-300 text-center font-black"
               >
-                Created At
+                <span onClick={() => sortFunc("createdAt")} className="block">
+                  Created At
+                </span>
+                <label className="input w-1/2 mx-auto mt-2">
+                  <svg
+                    className="h-[1em] opacity-50"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                  >
+                    <g
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      strokeWidth="2.5"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.3-4.3"></path>
+                    </g>
+                  </svg>
+                  <input type="search" required placeholder="Search" />
+                </label>
               </th>
             </tr>
           </thead>
@@ -114,10 +194,22 @@ const MyTable: React.FC = () => {
             {filteredNotices.map((notice) => {
               return (
                 <tr key={notice.id}>
-                  <th>{notice.id}</th>
-                  <td>{notice.title}</td>
-                  <td>{notice.status}</td>
-                  <td>{new Date(notice.createdAt).toLocaleDateString()}</td>
+                  <th className="text-center">{notice.id}</th>
+                  <td className="text-center">{notice.title}</td>
+                  <td className="text-center">
+                    <p
+                      className={`${
+                        notice.status === "active"
+                          ? "bg-secondary"
+                          : "bg-primary-content"
+                      } py-1.5 rounded-full`}
+                    >
+                      {notice.status}
+                    </p>
+                  </td>
+                  <td className="text-center">
+                    {new Date(notice.createdAt).toLocaleDateString()}
+                  </td>
                 </tr>
               );
             })}
@@ -126,10 +218,26 @@ const MyTable: React.FC = () => {
       </div>
       <div className="flex justify-center mt-20">
         <div className="join ">
+          <button
+            className="join-item btn btn-secondary"
+            onClick={() => {
+              if (page > 1) {
+                const newPage = page - 1;
+                const newParams = new URLSearchParams(params);
+                newParams.set("page", String(newPage));
+                setParams({ page: String(newPage) });
+              }
+            }}
+            disabled={page === 1}
+          >
+            ◀
+          </button>
           {Array.from({ length: allPages }).map((_, i) => (
             <button
               key={i + 1}
-              className={`join-item btn ${page === i + 1 ? "btn-active" : ""}`}
+              className={`join-item btn btn-secondary ${
+                page === i + 1 ? "bg-accent-content text-primary" : ""
+              }`}
               onClick={() => {
                 const newParams = new URLSearchParams(params);
                 newParams.set("page", String(i + 1));
@@ -139,6 +247,20 @@ const MyTable: React.FC = () => {
               {i + 1}
             </button>
           ))}
+          <button
+            className="join-item btn btn-secondary"
+            onClick={() => {
+              if (page < allPages) {
+                const newPage = page + 1;
+                const newParams = new URLSearchParams(params);
+                newParams.set("page", String(newPage));
+                setParams({ page: String(newPage) });
+              }
+            }}
+            disabled={page === allPages}
+          >
+            ▶
+          </button>
         </div>
       </div>
     </div>
