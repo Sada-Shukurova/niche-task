@@ -2,8 +2,20 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import type { INotice, INoticeTotal } from "../../assets/types";
 import { useSearchParams } from "react-router-dom";
+import useDebounce from "../../assets/useDebounce";
 
 const MyTable: React.FC = () => {
+  // search
+  const [searchId, setSearchId] = useState("");
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchStatus, setSearchStatus] = useState("");
+  const [searchCreatedAt, setSearchCreatedAt] = useState("");
+
+  const debounceId = useDebounce(searchId, 500);
+  const debounceTitle = useDebounce(searchTitle, 500);
+  const debounceStatus = useDebounce(searchStatus, 500);
+  const debounceCreatedAt = useDebounce(searchCreatedAt, 500);
+
   const [data, setData] = useState<INotice[]>([]);
   const [allPages, setAllPages] = useState<number>(1);
   const [sorted, setSorted] = useState<keyof INotice | "">("");
@@ -44,7 +56,28 @@ const MyTable: React.FC = () => {
   // filtering
   const filteredNotices = (data || [])
     .filter((notice) => {
-      return statusFilter ? notice.status.includes(statusFilter) : true;
+      const statusDropdownMatch = statusFilter
+        ? notice.status.includes(statusFilter)
+        : true;
+
+      const idMatch = debounceId
+        ? notice.id.toString().includes(debounceId)
+        : true;
+      const titleMatch = debounceTitle
+        ? notice.title.toLowerCase().includes(debounceTitle.toLowerCase())
+        : true;
+      const statusMatch = debounceStatus
+        ? notice.status.toLowerCase().includes(debounceStatus.toLowerCase())
+        : true;
+      const dateMatch = debounceCreatedAt
+        ? new Date(notice.createdAt)
+            .toLocaleDateString()
+            .includes(debounceCreatedAt)
+        : true;
+
+      return (
+        statusDropdownMatch && idMatch && titleMatch && statusMatch && dateMatch
+      );
     })
     .sort((a, b) => {
       if (!sorted) return 0;
@@ -57,24 +90,43 @@ const MyTable: React.FC = () => {
   return (
     <div className="mt-20">
       <div className="flex justify-end mb-20">
-        <select
-          value={statusFilter}
-          className="select select-primary"
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option className="bg-primary text-primary-content" value="">
-            Status
-          </option>
-          <option className="bg-primary text-primary-content" value={"active"}>
-            Active
-          </option>
-          <option
-            className="bg-primary text-primary-content"
-            value={"archived"}
+        <div className="flex gap-5">
+          <select
+            value={statusFilter}
+            className="select select-primary"
+            onChange={(e) => setStatusFilter(e.target.value)}
           >
-            Archived
-          </option>
-        </select>
+            <option className="bg-primary text-primary-content" value="">
+              Status
+            </option>
+            <option
+              className="bg-primary text-primary-content"
+              value={"active"}
+            >
+              Active
+            </option>
+            <option
+              className="bg-primary text-primary-content"
+              value={"archived"}
+            >
+              Archived
+            </option>
+          </select>
+          {/* reset */}
+          <button
+            className="btn btn-outline btn-secondary duration-500 transition-all"
+            onClick={() => {
+              setStatusFilter("");
+              setSearchId("");
+              setSearchTitle("");
+              setSearchStatus("");
+              setSearchCreatedAt("");
+            }}
+          >
+            Clear Filters
+          </button>
+        </div>
+        {/*  */}
       </div>
       <div className="overflow-x-auto rounded-box  shadow-[0_0_15px_rgba(0,0,0,0.25)] shadow-primary-content/60  bg-accent/20">
         <table className="table table-zebra">
@@ -104,7 +156,12 @@ const MyTable: React.FC = () => {
                       <path d="m21 21-4.3-4.3"></path>
                     </g>
                   </svg>
-                  <input type="search" required placeholder="Search" />
+                  <input
+                    type="search"
+                    value={searchId}
+                    onChange={(e) => setSearchId(e.target.value)}
+                    placeholder="Search"
+                  />
                 </label>
               </th>
               <th
@@ -131,7 +188,12 @@ const MyTable: React.FC = () => {
                       <path d="m21 21-4.3-4.3"></path>
                     </g>
                   </svg>
-                  <input type="search" required placeholder="Search" />
+                  <input
+                    value={searchTitle}
+                    onChange={(e) => setSearchTitle(e.target.value)}
+                    type="search"
+                    placeholder="Search"
+                  />
                 </label>
               </th>
               <th
@@ -158,7 +220,12 @@ const MyTable: React.FC = () => {
                       <path d="m21 21-4.3-4.3"></path>
                     </g>
                   </svg>
-                  <input type="search" required placeholder="Search" />
+                  <input
+                    value={searchStatus}
+                    onChange={(e) => setSearchStatus(e.target.value)}
+                    type="search"
+                    placeholder="Search"
+                  />
                 </label>
               </th>
               <th
@@ -185,7 +252,12 @@ const MyTable: React.FC = () => {
                       <path d="m21 21-4.3-4.3"></path>
                     </g>
                   </svg>
-                  <input type="search" required placeholder="Search" />
+                  <input
+                    value={searchCreatedAt}
+                    onChange={(e) => setSearchCreatedAt(e.target.value)}
+                    type="search"
+                    placeholder="Search"
+                  />
                 </label>
               </th>
             </tr>
@@ -200,8 +272,8 @@ const MyTable: React.FC = () => {
                     <p
                       className={`${
                         notice.status === "active"
-                          ? "bg-secondary"
-                          : "bg-primary-content"
+                          ? "bg-primary text-primary-content"
+                          : "bg-primary-content "
                       } py-1.5 rounded-full`}
                     >
                       {notice.status}
