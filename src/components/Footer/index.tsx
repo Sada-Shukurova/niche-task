@@ -1,9 +1,9 @@
 const Footer = () => {
   return (
     <>
-      <footer className="mt-20 footer footer-horizontal footer-center bg-primary text-primary-content p-10">
+      <footer className="mt-20 footer footer-horizontal footer-center bg-primary-content text-accent p-10 rounded-tl-box rounded-tr-box">
         <aside>
-          <p className="font-bold">
+          <p className="font-bold mb-10">
             Niche Solutions.
             <br />
             Software development company that provides custom software solutions
